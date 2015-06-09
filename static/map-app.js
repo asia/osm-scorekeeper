@@ -63,6 +63,13 @@ $(function() {
     $(".user-name").val("");
     addUser(username);
   });
+
+  // adding a new team
+  $(".add-team").click(function() {
+    var teamName = $("input.team-name").val();
+    $("input.team-name").val("");
+    addTeam(teamName);
+  });
 });
 
 function getIndex() {
