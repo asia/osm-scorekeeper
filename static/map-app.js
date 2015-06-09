@@ -1,12 +1,13 @@
-var map;
+var layers = [];
+var activeLayer;
 var teams = [];
-var index = 0;
 var startTime;
 var seenIDs = [];
 var targetTags = {
   "amenity": [
     "school",
-    "hospital"
+    "hospital",
+    "park"
   ],
   "building": [
     "yes",
@@ -15,25 +16,28 @@ var targetTags = {
 }
 
 $(function() {
-  $('.owl-carousel').owlCarousel({
-    loop: false,
-    nav: false,
-    items: 1
-  });
-
   map = L.map('map').setView([47.9214, 106.912], 13);
   map.attributionControl.setPrefix('');
-  L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+  L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
 
+  var owl = $('.owl-carousel').owlCarousel({
+    loop: false,
+    nav: true,
+    items: 1
+  });
+  owl.on('changed.owl.carousel', function(e) {
+    var index = e.page.index;
+    refreshTeam(index);
+    map.removeLayer(activeLayer);
+    activeLayer = layers[index];
+    activeLayer.addTo(map);
+  });
+
   // without a team and user list, initialize that
   if (!gup("teams")) {
-    teams.push({
-      users: [],
-      counts: [0, 0, 0],
-      tagCounts: {}
-    });
+    addTeam("1");
   }
 
   // measure from start of the hackathon
@@ -42,6 +46,10 @@ $(function() {
   if (gup("demo")) {
     startTime = 1433372507005;
     addUser("mapmeld");
+
+    // sample second team
+    addTeam("world");
+    addUser("zorque", 1);
   }
   if (!startTime || isNaN(startTime)) {
     startTime = (1 * new Date()) - 24 * 60 * 60 * 1000;
@@ -57,15 +65,25 @@ $(function() {
   });
 });
 
+function getIndex() {
+  var slides = $(".owl-item");
+  for (var i = 0; i < slides.length; i++) {
+    if ($(slides[i]).hasClass("active")) {
+      return i;
+    }
+  }
+}
+
 function refreshTeam(index) {
   var teamCounts = teams[index].counts;
   var updateTime = (new Date()) * 1;
 
-  $(".users").html("");
+  var teamPage = $($(".item")[index]);
+  teamPage.find(".users").html("");
 
   for (var i = 0; i < teams[index].users.length; i++) {
     var user = teams[index].users[i];
-    $(".users").append($("<li>" + user.name + "</li>"));
+    teamPage.find(".users").append($("<li>" + user.name + "</li>"));
 
     if (updateTime < user.lastUpdate + (2 * 60 * 1000)) {
       // don't over-update me
@@ -78,26 +96,47 @@ function refreshTeam(index) {
       filterIDs(data.delete);
 
       // count tags
-      countTags(data.create);
-      countTags(data.modify);
-      countTags(data.delete);
+      countTags(data.create, index);
+      countTags(data.modify, index);
+      countTags(data.delete, index);
 
       // count items
-      teamCounts[0] += updateCount(data.create, "#0f0");
-      $(".created .number").text(teamCounts[0]);
+      teamCounts[0] += updateCount(data.create, "#0f0", index);
+      teamPage.find(".created .number").text(teamCounts[0]);
 
-      teamCounts[1] += updateCount(data.modify, "#00f");
-      $(".modified .number").text(teamCounts[1]);
+      teamCounts[1] += updateCount(data.modify, "#00f", index);
+      teamPage.find(".modified .number").text(teamCounts[1]);
 
-      teamCounts[2] += updateCount(data.delete, "#f00");
-      $(".deleted .number").text(teamCounts[2]);
+      teamCounts[2] += updateCount(data.delete, "#f00", index);
+      teamPage.find(".deleted .number").text(teamCounts[2]);
     });
     // set for next update
     teams[index].users[i].lastUpdate = updateTime;
   }
 }
 
-function addUser(username) {
+function addTeam(teamName) {
+  var layer = L.layerGroup();
+  layers.push(layer);
+  if (!activeLayer) {
+    activeLayer = layer;
+    layer.addTo(map);
+  }
+
+  $($(".item")[teams.length]).find('.team-name').text(teamName);
+
+  teams.push({
+    name: teamName,
+    users: [],
+    counts: [0, 0, 0],
+    tagCounts: {}
+  });
+}
+
+function addUser(username, index) {
+  if (!index) {
+    index = getIndex();
+  }
   if (username) {
     for (var u = 0; u < teams[index].users.length; u++) {
       if (teams[index].users[u].name === username) {
@@ -146,7 +185,7 @@ function filterIDs(changesets) {
   }
 }
 
-function updateCount(list, color) {
+function updateCount(list, color, index) {
   var counter = 0;
   for (var c = 0; c < list.length; c++) {
     counter += (list[c].relation || []).length;
@@ -155,23 +194,28 @@ function updateCount(list, color) {
 
     if (list[c].node) {
       for (var n = 0; n < list[c].node.length; n++) {
-        mapNode(list[c].node[n], color);
+        mapNode(list[c].node[n], color, index);
       }
     }
   }
   return counter;
 }
 
-function mapNode(node, color) {
+function mapNode(node, color, index) {
+  if (!index) {
+    index = getIndex();
+  }
   var lat = node.$.lat * 1;
   var lon = node.$.lon * 1;
   if (!isNaN(lat) && !isNaN(lon)) {
-    L.circleMarker(L.latLng(lat, lon), { color: color, fillColor: color, radius: 3 }).addTo(map);
+    var circleOpts = { color: color, fillColor: color, radius: 3 };
+    L.circleMarker(L.latLng(lat, lon), circleOpts).addTo(layers[index]);
   }
 }
 
-function findTags(list) {
+function findTags(list, index) {
   // given a list of nodes, ways, or relations
+  var teamPage = $($(".item")[index]);
   for (var n = 0; n < list.length; n++) {
     var tags = list[n].tag;
     if (!tags) {
@@ -195,7 +239,7 @@ function findTags(list) {
 
         // add the new tag to the UI
         if (newTag) {
-          $(".tags").append(
+          teamPage.find(".tags").append(
             $("<li>")
               .text(key + ": " + value)
               .addClass(key + value)
@@ -206,23 +250,23 @@ function findTags(list) {
         }
 
         // update count
-        $(".tags").find("." + key + value + " .smallnum").text(teams[index].tagCounts[key][value]);
+        teamPage.find(".tags ." + key + value + " .smallnum").text(teams[index].tagCounts[key][value]);
       }
     }
   }
 }
 
-function countTags(list) {
+function countTags(list, index) {
   // given a list of changesets
   for (var c = 0; c < list.length; c++) {
     list[c].node = list[c].node || [];
-    findTags(list[c].node);
+    findTags(list[c].node, index);
 
     list[c].way = list[c].way || [];
-    findTags(list[c].way);
+    findTags(list[c].way, index);
 
     list[c].relation = list[c].relation || [];
-    findTags(list[c].relation);
+    findTags(list[c].relation, index);
   }
 }
 

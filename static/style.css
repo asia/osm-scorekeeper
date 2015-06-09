@@ -4,6 +4,21 @@
 	min-height: 800px;
 }
 
+.owl-nav > div {
+	display: inline-block;
+	font-weight: bold;
+	border: 1px solid #000;
+	border-radius: 4px;
+	padding: 4px;
+	margin: 10px;
+}
+.owl-prev {
+	content: "<";
+}
+.owl-next {
+	content: ">";
+}
+
 .user-column {
 	background-color: #eee;
 	min-height: 800px;

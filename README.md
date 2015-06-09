@@ -13,7 +13,6 @@ Simple scoreboard for an OSM map-athon
 # Todo
 
 * Automatically refreshing user counts
-* Adding teams and cycling between them, keeping map, UI, and tallies from crossover
 * Saving teams and tallied data to PouchDB or the URL history
 * Visually map ways and relations? Or is that too much data?
 
