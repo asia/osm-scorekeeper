@@ -29,8 +29,8 @@ app.get('/userUpdate', function(req, res) {
     });
   } else {
     // provided right params for changeset request
-    lastUpdate = (new Date(lastUpdate * 1)).toISOString();
-    request("http://api.openstreetmap.org/api/0.6/changesets?display_name=" + name + "&time=" + lastUpdate, function(err, resp, body) {
+    lastUpdate = new Date(lastUpdate * 1);
+    request("http://api.openstreetmap.org/api/0.6/changesets?display_name=" + name, function(err, resp, body) {
       if (err) {
         throw err;
       }
@@ -38,8 +38,13 @@ app.get('/userUpdate', function(req, res) {
       var changesetIDs = [];
       var changesets = $(body).find('changeset');
       for (var c = 0; c < changesets.length; c++) {
+        var closeTime = new Date($(changesets[c]).attr("closed_at"));
+        if (closeTime < lastUpdate) {
+          break;
+        }
         changesetIDs.push($(changesets[c]).attr("id"));
       }
+
       // res.json(changesetIDs);
       var changes = {
         create: [],
