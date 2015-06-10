@@ -10,7 +10,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express['static'](__dirname + '/static'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(compression());
 
 app.get('/', function(req, res) {
@@ -49,7 +49,7 @@ app.get('/userUpdate', function(req, res) {
       var changes = {
         create: [],
         modify: [],
-        delete: []
+        "delete": []
       };
       var measureChanges = function(index) {
         if (index >= changesetIDs.length) {
@@ -71,8 +71,8 @@ app.get('/userUpdate', function(req, res) {
             if (result.osmChange.modify) {
               changes.modify = changes.modify.concat( result.osmChange.modify );
             }
-            if (result.osmChange.delete) {
-              changes.delete = changes.delete.concat( result.osmChange.delete );
+            if (result.osmChange["delete"]) {
+              changes["delete"] = changes["delete"].concat( result.osmChange["delete"] );
             }
             measureChanges(index + 1);
           });
@@ -86,3 +86,5 @@ app.get('/userUpdate', function(req, res) {
 var server = app.listen(process.env.PORT || 3000, function () {
   var port = server.address().port;
 });
+
+module.exports = app;

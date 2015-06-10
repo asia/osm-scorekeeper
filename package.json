@@ -19,7 +19,16 @@
     "request": "^2.57.0",
     "xml2js": "^0.4.9"
   },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "jshint": "^2.8.0",
+    "mocha": "^2.2.5",
+    "supertest": "^1.0.1"
+  },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "test": "npm run test-jshint && npm run test-mocha",
+    "test-jshint": "jshint *.js --config test/.jshintrc && jshint static/*.js --config test/.jshintrc",
+    "test-mocha": "mocha"
   }
 }
