@@ -38,8 +38,8 @@ app.get('/userUpdate', function(req, res) {
       var changesetIDs = [];
       var changesets = $(body).find('changeset');
       for (var c = 0; c < changesets.length; c++) {
-        var closeTime = new Date($(changesets[c]).attr("closed_at"));
-        if (closeTime < lastUpdate) {
+        var closeTime = $(changesets[c]).attr("closed_at");
+        if (closeTime && ((new Date(closeTime)) < lastUpdate)) {
           break;
         }
         changesetIDs.push($(changesets[c]).attr("id"));
