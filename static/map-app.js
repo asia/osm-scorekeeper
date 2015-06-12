@@ -20,7 +20,23 @@ var targetTags = {
   ],
   "building": [
     "yes",
-    "ger"
+    "ger",
+    "construction"
+  ],
+  "natural": [
+    "river",
+    "water",
+    "coastline",
+    "riverbank",
+    "tree",
+    "forest"
+  ],
+  "barrier": [
+    "fence",
+    "khashaa"
+  ],
+  "landuse": [
+    "construction"
   ]
 };
 
@@ -276,8 +292,8 @@ $(function() {
     addUser("mapmeld");
 
     // sample second team
-    addTeam("world");
-    addUser("zorque", 1);
+    //addTeam("world");
+    //addUser("zorque", 1);
   }
   if (!startTime || isNaN(startTime)) {
     startTime = (1 * new Date()) - 24 * 60 * 60 * 1000;
