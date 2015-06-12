@@ -6,7 +6,8 @@ Simple scoreboard for an OSM map-athon
 * Tally all nodes, ways, and relations which were added / modified / deleted by the team since 'startTime'
 * Track target tags (building=yes, amenity=hospital)
 * Avoid any double-counts
-* Visually map any nodes added / modified / deleted by the team
+* Visually map the nodes added / modified / deleted by the team
+* Count squares completed by the team in Tasking Manager
 
 <img src="http://i.imgur.com/XgZZtG7.png"/>
 

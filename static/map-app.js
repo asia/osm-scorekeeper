@@ -30,7 +30,7 @@ function filterIDs(changesets) {
     var items = changeset[type] || [];
     for (var n = items.length - 1; n >= 0; n--) {
       var id = type + ":" + items[n].$.id;
-      if (seenIDs.indexOf(id) > -1) {
+      if ((items[n].$.id * 1 <= 0) || (seenIDs.indexOf(id) > -1)) {
         items.splice(n, 1);
       } else {
         seenIDs.push(id);
@@ -74,10 +74,15 @@ function updateCount(list, color, index) {
   for (var c = 0; c < list.length; c++) {
     counter += (list[c].relation || []).length;
     counter += (list[c].way || []).length;
-    counter += (list[c].node || []).length;
 
-    if (list[c].node) {
-      for (var n = 0; n < list[c].node.length; n++) {
+    // only count nodes if they were tagged (not part of a way)
+    // map nodes in ways to illustrate them, but only 1/4 to simplify circles and things
+    var nodeCount = 0;
+    list[c].node = list[c].node || [];
+    for(var n = 0; n < list[c].node.length; n++) {
+      if (list[c].node[n].tag) {
+        counter++;
+      } else if (Math.random() > 0.75) {
         mapNode(list[c].node[n], color, index);
       }
     }
