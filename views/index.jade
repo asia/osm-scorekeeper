@@ -36,6 +36,10 @@ html
                 span Deleted
               h4 Tagged
               ul.tags
+              h4 Finished
+              .completed
+                span.number
+                span Squares
             .item
               h3
                 span Team&nbsp;
@@ -54,6 +58,10 @@ html
                 span Deleted
               h4 Tagged
               ul.tags
+              h4 Finished
+              .completed
+                span.number
+                span Squares
             .item
               h3
                 span Team&nbsp;
@@ -72,6 +80,10 @@ html
                 span Deleted
               h4 Tagged
               ul.tags
+              h4 Finished
+              .completed
+                span.number
+                span Squares
           h4 Admin
           .form-horizontal
             input.user-name(type="text", placeholder="OSM Username")
@@ -79,6 +91,7 @@ html
           .form-horizontal
             input.team-name(type="text", placeholder="Team Name")
             button.add-team Add Team
+          button.refresh-tiles Count Squares
         .col-xs-8
           h3 Map
           #map

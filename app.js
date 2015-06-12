@@ -83,6 +83,54 @@ app.get('/userUpdate', function(req, res) {
   }
 });
 
+app.get('/taskUpdate', function(req, res) {
+  var projects = req.query.projects.split(',');
+  var taskSrc = req.query.taskSrc || 'hotosm.org';
+  var userCounts = {};
+
+  var processProject = function(i) {
+    if (i >= projects.length) {
+      return res.json(userCounts);
+    }
+    request("http://tasks." + taskSrc + "/project/" + projects[i] + "/tasks.json", function(err, resp, body) {
+      if (err) {
+        throw err;
+      }
+      var squares = JSON.parse(body).features;
+      var processSquare = function(f) {
+        if (f >= squares.length) {
+          return processProject(i + 1);
+        }
+        request({
+          url: "http://tasks." + taskSrc + "/project/" + projects[i] + "/task/" + squares[f].id,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        }, function (err, resp, body) {
+          if (err) {
+            throw err;
+          }
+          var finished = body.indexOf("Marked as done");
+          if (finished > -1) {
+            var invalidated = body.indexOf("Invalidated");
+            if (invalidated === -1 || invalidated > finished) {
+              var username = body.split("Marked as done</b> by ")[1].split("</span>")[0];
+              if (userCounts[username]) {
+                userCounts[username]++;
+              } else {
+                userCounts[username] = 1;
+              }
+            }
+          }
+          processSquare(f + 1);
+        });
+      };
+      processSquare(0);
+    });
+  };
+  processProject(0);
+});
+
 var server = app.listen(process.env.PORT || 3000, function () {
   var port = server.address().port;
 });

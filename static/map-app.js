@@ -4,7 +4,14 @@ var teams = [];
 var seenIDs = [];
 
 // customizable for your hackathon
-// e.g. amenity = school add { "amenity": [ "school" ] }
+
+// source of task manager
+var taskSrc = "teachosm.org";
+
+// projects in Task Manager
+var projects = [33];
+
+// tags e.g. amenity = school add { "amenity": [ "school" ] }
 var targetTags = {
   "amenity": [
     "school",
@@ -285,5 +292,31 @@ $(function() {
     var teamName = $("input.team-name").val();
     $("input.team-name").val("");
     addTeam(teamName);
+  });
+
+  // refreshing tiles
+  $(".refresh-tiles").click(function() {
+    $.getJSON("/taskUpdate?projects=" + projects.join(",") + "&taskSrc=" + taskSrc, function(data) {
+      $(".completed .number").text("0");
+      for (var user in data) {
+        if(data.hasOwnProperty(user)) {
+          var foundUser = false;
+          for (var t = 0; t < teams.length; t++) {
+            for (var u = 0; u < teams[t].users.length; u++) {
+              var tuser = teams[t].users[u];
+              if (tuser.name === user) {
+                var currentCount = $($(".item")[t]).find(".completed .number").text() * 1;
+                $($(".item")[t]).find(".completed .number").text(data[user] * 1 + currentCount);
+                foundUser = true;
+                break;
+              }
+            }
+            if (foundUser) {
+              break;
+            }
+          }
+        }
+      }
+    });
   });
 });

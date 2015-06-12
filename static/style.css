@@ -28,7 +28,7 @@
 	margin: 10px;
 }
 
-.created, .modified, .deleted {
+.created, .modified, .deleted, .completed {
 	display: inline-block;
 	padding: 8px;
 }
