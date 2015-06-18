@@ -9,7 +9,7 @@ var seenIDs = [];
 var taskSrc = "teachosm.org";
 
 // projects in Task Manager
-var projects = [33];
+var projects = [25, 27, 31, 32, 33, 34, 35, 41];
 
 // tags e.g. amenity = school add { "amenity": [ "school" ] }
 var targetTags = {
@@ -26,14 +26,19 @@ var targetTags = {
   "natural": [
     "river",
     "water",
-    "coastline",
     "riverbank",
     "tree",
     "forest"
   ],
+  "water": [
+    "river",
+    "stream"
+  ],
+  "waterway": [
+    "riverbank"
+  ],
   "barrier": [
-    "fence",
-    "khashaa"
+    "fence"
   ],
   "landuse": [
     "construction"
@@ -180,8 +185,8 @@ function refreshTeam(index) {
 
     // count tags
     countTags(data.create, index);
-    countTags(data.modify, index);
-    countTags(data["delete"], index);
+    //countTags(data.modify, index);
+    //countTags(data["delete"], index);
 
     // count items
     teamCounts[0] += updateCount(data.create, "#0f0", index);
@@ -317,27 +322,29 @@ $(function() {
 
   // refreshing tiles
   $(".refresh-tiles").click(function() {
-    $.getJSON("/taskUpdate?projects=" + projects.join(",") + "&taskSrc=" + taskSrc, function(data) {
-      $(".completed .number").text("0");
-      for (var user in data) {
-        if(data.hasOwnProperty(user)) {
-          var foundUser = false;
-          for (var t = 0; t < teams.length; t++) {
-            for (var u = 0; u < teams[t].users.length; u++) {
-              var tuser = teams[t].users[u];
-              if (tuser.name === user) {
-                var currentCount = $($(".item")[t]).find(".completed .number").text() * 1;
-                $($(".item")[t]).find(".completed .number").text(data[user] * 1 + currentCount);
-                foundUser = true;
+    $(".completed .number").text("0");
+    for (var t = 0; t < projects.length; t++) {
+      $.getJSON("/taskUpdate?projects=" + projects[t] + "&taskSrc=" + taskSrc, function(data) {
+        for (var user in data) {
+          if(data.hasOwnProperty(user)) {
+            var foundUser = false;
+            for (var t = 0; t < teams.length; t++) {
+              for (var u = 0; u < teams[t].users.length; u++) {
+                var tuser = teams[t].users[u];
+                if (tuser.name === user) {
+                  var currentCount = $($(".item")[t]).find(".completed .number").text() * 1;
+                  $($(".item")[t]).find(".completed .number").text(data[user] * 1 + currentCount);
+                  foundUser = true;
+                  break;
+                }
+              }
+              if (foundUser) {
                 break;
               }
             }
-            if (foundUser) {
-              break;
-            }
           }
         }
-      }
-    });
+      });
+    }
   });
 });

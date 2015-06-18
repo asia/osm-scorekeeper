@@ -125,7 +125,11 @@ app.get('/taskUpdate', function(req, res) {
           processSquare(f + 1);
         });
       };
-      processSquare(0);
+      try {
+        processSquare(0);
+      } catch(e) {
+        return res.json(userCounts);
+      }
     });
   };
   processProject(0);
