@@ -19,78 +19,55 @@ html
         .col-xs-4.user-column
           .owl-carousel
             .item
-              h3
-                span Team&nbsp;
-                span.team-name 1
-              h4 Users
-              ul.users
-              h4 Changes
-              .created
-                span.number
-                span Created
-              .modified
-                span.number
-                span Modified
-              .deleted
-                span.number
-                span Deleted
-              h4 Tagged
-              ul.tags
-              h4 Finished
-              .completed
-                span.number
-                span Squares
+              include team
             .item
-              h3
-                span Team&nbsp;
-                span.team-name 2
-              h4 Users
-              ul.users
-              h4 Changes
-              .created
-                span.number
-                span Created
-              .modified
-                span.number
-                span Modified
-              .deleted
-                span.number
-                span Deleted
-              h4 Tagged
-              ul.tags
-              h4 Finished
-              .completed
-                span.number
-                span Squares
+              include team
             .item
-              h3
-                span Team&nbsp;
-                span.team-name 3
-              h4 Users
-              ul.users
-              h4 Changes
-              .created
-                span.number
-                span Created
-              .modified
-                span.number
-                span Modified
-              .deleted
-                span.number
-                span Deleted
-              h4 Tagged
-              ul.tags
-              h4 Finished
-              .completed
-                span.number
-                span Squares
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
+            .item
+              include team
           h4 Admin
           .form-horizontal
             input.user-name(type="text", placeholder="OSM Username")
             button.add-user Add User
+          br
           .form-horizontal
             input.team-name(type="text", placeholder="Team Name")
-            button.add-team Add Team
+            button.name-team Name Team
+          br
+          button.refresh-team Update Team
           button.refresh-tiles Count Squares
         .col-xs-8
           h3 Map

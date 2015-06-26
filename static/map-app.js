@@ -21,7 +21,12 @@ var targetTags = {
   "building": [
     "yes",
     "ger",
-    "construction"
+    "construction",
+    "гэр",
+    "house"
+  ],
+  "name": [
+    "ger"
   ],
   "natural": [
     "river",
@@ -34,13 +39,25 @@ var targetTags = {
     "river",
     "stream"
   ],
+  "barrier": [
+    "ditch"
+  ],
   "waterway": [
-    "riverbank"
+    "riverbank",
+    "ditch"
   ],
   "barrier": [
-    "fence"
+    "fence",
+    "ditch"
   ],
   "landuse": [
+    "construction",
+    "forest"
+  ],
+  "area": [
+    "yes"
+  ],
+  "construction": [
     "construction"
   ]
 };
@@ -121,7 +138,7 @@ function findTags(list, index) {
     }
     for (var t = 0; t < tags.length; t++) {
       var key = tags[t].$.k;
-      var value = tags[t].$.v;
+      var value = tags[t].$.v.toLowerCase();
       if (targetTags[key] && targetTags[key].indexOf(value) > -1) {
         // target tag found, register to team
         var newTag = false;
@@ -149,6 +166,11 @@ function findTags(list, index) {
 
         // update count
         teamPage.find(".tags ." + key + value + " .smallnum").text(teams[index].tagCounts[key][value]);
+
+        // don't double-count this item
+        if (value !== "yes") {
+          break;
+        }
       }
     }
   }
@@ -185,7 +207,7 @@ function refreshTeam(index) {
 
     // count tags
     countTags(data.create, index);
-    //countTags(data.modify, index);
+    countTags(data.modify, index);
     //countTags(data["delete"], index);
 
     // count items
@@ -286,7 +308,9 @@ $(function() {
 
   // without a team and user list, initialize that
   if (!gup("teams")) {
-    addTeam("1");
+    for (var tt = 1; tt <= 20; tt++) {
+      addTeam(tt + "");
+    }
   }
 
   // measure from start of the hackathon
@@ -315,9 +339,20 @@ $(function() {
 
   // adding a new team
   $(".add-team").click(function() {
-    var teamName = $("input.team-name").val();
     $("input.team-name").val("");
-    addTeam(teamName);
+  });
+
+  // renaming a team
+  $(".name-team").click(function() {
+    var teamName = $("input.team-name").val();
+    var index = getIndex();
+    $($(".team-content")[index]).text(teamName);
+  });
+
+  // refreshing team
+  $(".refresh-team").click(function() {
+    var index = getIndex();
+    refreshTeam(index);
   });
 
   // refreshing tiles
